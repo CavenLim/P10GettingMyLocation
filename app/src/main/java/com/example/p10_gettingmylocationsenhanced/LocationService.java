@@ -27,47 +27,45 @@ public class LocationService extends Service {
     boolean started;
 
     LocationRequest locationRequest = LocationRequest.create();
-
-    LocationCallback mLocationCallback = new LocationCallback() {
-        @Override
-        public void onLocationResult(LocationResult locationResult) {
-            if (locationResult != null) {
-                Location data = locationResult.getLastLocation();
-                double lat = data.getLatitude();
-                double lng = data.getLongitude();
-                String msg = "Lat:" + lat + " Lng:"+ lng;
-                Toast.makeText(getApplicationContext(),msg,Toast.LENGTH_SHORT).show();
-
-
-
-
-                LatLng newloc = new LatLng(data.getLatitude(), data.getLongitude());
-
-                try {
-                    String folderLocation_I = getFilesDir().getAbsolutePath() + "/Folder";
-                    File targetFile_I = new File(folderLocation_I, "location.txt");
-                    FileWriter writer_I = new FileWriter(targetFile_I, true); writer_I.write(newloc.latitude+","+newloc.longitude + "\n");
-                    writer_I.flush();
-                    writer_I.close();
-                } catch (Exception e) {
-                    Toast.makeText(getApplicationContext(), "Failed to write!", Toast.LENGTH_LONG).show();
-                    e.printStackTrace(); }
-
-
-
-
-            }
-
-        };
-
-
-
-    };
-
-
+    FusedLocationProviderClient client;
+    LocationCallback mLocationCallback;
 
     @Override
     public void onCreate() {
+        client = LocationServices.getFusedLocationProviderClient( getApplicationContext());
+
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        locationRequest.setInterval(3000);
+        locationRequest.setFastestInterval(3000);
+        locationRequest.setSmallestDisplacement(0);
+        mLocationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                if (locationResult != null) {
+                    Location data = locationResult.getLastLocation();
+                    double lat = data.getLatitude();
+                    double lng = data.getLongitude();
+                    String msg = "Lat:" + lat + " Lng:"+ lng;
+                    Toast.makeText(getApplicationContext(),msg,Toast.LENGTH_SHORT).show();
+                    LatLng newloc = new LatLng(data.getLatitude(), data.getLongitude());
+
+                    try {
+                        String folderLocation_I = getFilesDir().getAbsolutePath() + "/Folder";
+                        File targetFile_I = new File(folderLocation_I, "location.txt");
+                        FileWriter writer_I = new FileWriter(targetFile_I, true); writer_I.write(newloc.latitude+","+newloc.longitude+"\n");
+                        writer_I.flush();
+                        writer_I.close();
+                    } catch (Exception e) {
+                        Toast.makeText(getApplicationContext(), "Failed to write!", Toast.LENGTH_LONG).show();
+                        e.printStackTrace(); }
+
+                }
+
+            };
+
+
+
+        };
         super.onCreate();
     }
 
@@ -77,8 +75,6 @@ public class LocationService extends Service {
         throw new UnsupportedOperationException("Not yet implemented");
     }
 
-
-
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
@@ -86,11 +82,9 @@ public class LocationService extends Service {
             started = true;
 
             checkPermission();
-            locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-            locationRequest.setInterval(3000);
-            locationRequest.setFastestInterval(3000);
-            locationRequest.setSmallestDisplacement(0);
-            FusedLocationProviderClient client = LocationServices.getFusedLocationProviderClient( getApplicationContext());
+
+
+
 
             client.requestLocationUpdates(locationRequest, mLocationCallback, null);
 
@@ -118,7 +112,7 @@ public class LocationService extends Service {
     @Override
     public void onDestroy() {
         Log.d("MyService", "Service exited");
-        FusedLocationProviderClient client = LocationServices.getFusedLocationProviderClient( getApplicationContext());
+
 
         client.removeLocationUpdates(mLocationCallback);
 

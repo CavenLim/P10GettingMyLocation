@@ -75,19 +75,27 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("File Read/Write", "Folder created");
             }
         }
-
-        FragmentManager fm = getSupportFragmentManager();
-        SupportMapFragment mapFragment = (SupportMapFragment) fm.findFragmentById(R.id.map);
-
         int permissionCheck = ContextCompat.checkSelfPermission(
                 MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
 
         if (permissionCheck == PermissionChecker.PERMISSION_GRANTED) {
-           Toast.makeText(getApplicationContext(),"No permission",Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(),"permission Granted",Toast.LENGTH_SHORT).show();
         } else {
             ActivityCompat.requestPermissions(MainActivity.this,new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},0 );
 
         }
+
+        String folderLocation_I = getFilesDir().getAbsolutePath() + "/Folder";
+        File folder_I = new File(folderLocation_I);
+        if (folder_I.exists() == false){
+            boolean result = folder_I.mkdir(); if (result == true){
+                Log.d("File Read/Write", "Folder created"); }
+        }
+
+        FragmentManager fm = getSupportFragmentManager();
+        SupportMapFragment mapFragment = (SupportMapFragment) fm.findFragmentById(R.id.map);
+
+
 
         mapFragment.getMapAsync(new OnMapReadyCallback() {
             @Override
@@ -172,6 +180,7 @@ public class MainActivity extends AppCompatActivity {
         btnStopDetect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                checkPermission();
                 Intent i = new Intent(MainActivity.this, LocationService.class);
                 stopService(i);
 
@@ -221,4 +230,6 @@ public class MainActivity extends AppCompatActivity {
             return false;
         }
     }
+
+
 }

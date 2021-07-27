@@ -16,7 +16,13 @@
             android:id="@+id/btnRefresh"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Button" />
+            android:text="Refresh" />
+
+        <Button
+            android:id="@+id/btnFavourites"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Favourites" />
 
         <TextView
             android:id="@+id/tvRecords"
